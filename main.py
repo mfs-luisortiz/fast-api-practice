@@ -1,7 +1,7 @@
 from typing import Union
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
+from data.database import get_users
 
 
 app = FastAPI()
@@ -20,11 +20,17 @@ app.add_middleware(
 )
 
 
-@app.get("api/")
+@app.get("/api/hello")
 def read_root():
-    return {"Hello": "World"}
+    response = {}
+    users = []
+    for user in get_users():
+        users.append({
+            'id': user[0],
+            'nombre': user[1],
+            'email': user[2],
+            'telefono': user[3]
+        })
+    response["usuarios"] = users
+    return response
 
-
-@app.get("api/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
